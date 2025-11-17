@@ -13,44 +13,34 @@ type Vehicle = {
 type Props = {
   vehicle: Vehicle;
   onView?: (v: Vehicle) => void;
-  onReport?: (v: Vehicle) => void;
 };
 
-export default function CarCard({ vehicle, onView, onReport }: Props) {
+export default function CarCard({ vehicle, onView }: Props) {
   return (
-    <article className="bg-gray-100 border border-gray-300 rounded-lg shadow-sm p-4 w-82 hover:shadow-md transition duration-200">
-      <header className="flex items-start justify-between">
+    <article className="bg-white border border-slate-200 rounded-lg shadow-sm p-4 w-82 hover:shadow-md transition duration-200">
+      <header className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="text-base font-semibold text-gray-800">{vehicle.noserie}</h3>
-          <p className="text-[11px] text-gray-500"># No. de serie</p>
+          <h3 className="text-base font-semibold text-slate-800">{vehicle.noserie}</h3>
+          <p className="text-xs text-slate-500 mt-0.5">No. de serie</p>
         </div>
 
-        <span className="text-[11px] font-medium px-2 py-1 rounded bg-gray-200 text-gray-700">
+        <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
           {vehicle.tipo || "—"}
         </span>
       </header>
 
-      <div className="mt-2 text-sm text-gray-700 space-y-1">
-        <p><strong>Marca:</strong> {vehicle.marca ?? "—"}</p>
-        <p><strong>Submarca:</strong> {vehicle.submarca ?? "—"}</p>
-        <p><strong>Linea:</strong> {vehicle.linea ?? "—"}</p>
-        <p><strong>Color:</strong> {vehicle.color ?? "—"}</p>
+      <div className="mt-3 text-sm text-slate-700 space-y-1.5">
+        <p><strong className="text-slate-800">Marca:</strong> <span className="text-slate-600">{vehicle.marca ?? "—"}</span></p>
+        <p><strong className="text-slate-800">Línea:</strong> <span className="text-slate-600">{vehicle.linea ?? "—"}</span></p>
+        <p><strong className="text-slate-800">Color:</strong> <span className="text-slate-600">{vehicle.color ?? "—"}</span></p>
       </div>
 
-      <div className="mt-3 flex gap-2">
+      <div className="mt-4">
         <button
           onClick={() => onView?.(vehicle)}
-          className="flex-1 py-1.5 rounded-md bg-[#6c8ebf] text-white text-xs font-medium hover:bg-[#5e7da8]"
+          className="w-full py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-400 transition shadow-sm"
         >
           Ver detalles
-        </button>
-
-
-        <button
-          onClick={() => onReport?.(vehicle)}
-          className="py-1.5 px-3 rounded-md bg-[#d8c972] text-xs font-medium text-gray-800 hover:bg-[#c8b862]"
-        >
-          Reporte
         </button>
       </div>
     </article>
