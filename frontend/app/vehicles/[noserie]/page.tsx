@@ -128,7 +128,7 @@ export default function VehicleSensorsPage() {
         throw new Error(result.error || "Error al completar reporte");
       }
 
-      alert("✅ Reporte completado y sensores restablecidos");
+      alert("Reporte completado y sensores restablecidos");
       
       // Refresh data
       const reportsRes = await fetch(`http://localhost:3000/reports/vehicle/${noserie}`);
@@ -143,7 +143,7 @@ export default function VehicleSensorsPage() {
       const sensorJson = await sensorRes.json();
       setSensor(sensorJson.data ?? null);
     } catch (error: any) {
-      alert("❌ Error: " + error.message);
+      alert("Error: " + error.message);
     } finally {
       setCompletingReport(null);
     }
@@ -179,7 +179,7 @@ export default function VehicleSensorsPage() {
           {owner ? (
             <div className="bg-white border border-slate-200 p-5 rounded-lg shadow-sm">
               <h2 className="text-lg font-semibold text-slate-700 mb-3">Propietario</h2>
-              <p className="text-slate-600 mb-1"><strong className="text-slate-700">Nombre:</strong> {owner.tmbre}</p>
+              <p className="text-slate-600 mb-1"><strong className="text-slate-700">Nombre:</strong> {owner.nombre + owner.apellido}</p>
               <p className="text-slate-600 mb-1"><strong className="text-slate-700">CURP:</strong> {owner.curp}</p>
               <p className="text-slate-600"><strong className="text-slate-700">Email:</strong> {owner.email}</p>
             </div>
