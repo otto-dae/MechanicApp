@@ -4,6 +4,7 @@ import vehiclesRouter from './routes/vehicles.js';
 import sensorsRouter from "./routes/sensors.js";
 import fillSensors from './scripts/sensorSim.js'; 
 import reportsRouter from "./routes/reports.js";
+import mechanicsRouter from "./routes/mechanics.js";
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/vehicles", vehiclesRouter);
 app.use("/reports", reportsRouter);
 
 app.use("/sensors", sensorsRouter);
+app.use("/mechanics", mechanicsRouter);
 
 
 

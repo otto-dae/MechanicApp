@@ -108,7 +108,68 @@ router.get("/", async (req, res) => {
   return res.status(200).json({ data });
 });
 
-/** PDF GENERATION ENDPOINT **/
+/** GET REPORTS FOR SPECIFIC VEHICLE **/
+router.get("/vehicle/:noserie", async (req, res) => {
+  const { noserie } = req.params;
+
+  const { data, error } = await DB
+    .from("reportes")
+    .select("*")
+    .eq("vehiculo", noserie)
+    .order("fecha", { ascending: false });
+
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ data });
+});
+
+/** MARK REPORT AS COMPLETE AND RESET SENSORS **/
+router.patch("/:id/complete", async (req, res) => {
+  const { id } = req.params;
+  const { vehiculo } = req.body;
+
+  if (!vehiculo) {
+    return res.status(400).json({ error: "Vehicle ID is required" });
+  }
+
+  try {
+    // Mark report as complete
+    const { data: updatedReport, error: reportError } = await DB
+      .from("reportes")
+      .update({ estado: true })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (reportError) {
+      return res.status(500).json({ error: reportError.message });
+    }
+
+    const healthySensorValues = {
+      nivelaceite: 100,
+      frenos: 100,
+      nivelanticongelante: 100,
+      nivelpresion: 100,
+    };
+
+    const { error: sensorError } = await DB
+      .from("sensores")
+      .update(healthySensorValues)
+      .eq("vehiculo", vehiculo);
+
+    if (sensorError) {
+      return res.status(500).json({ error: sensorError.message });
+    }
+
+    return res.status(200).json({
+      message: "Report completed and sensors reset successfully",
+      report: updatedReport,
+    });
+  } catch (error) {
+    console.error("Error completing report:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 router.get("/:id/pdf", async (req, res) => {
   const { id } = req.params;
 
@@ -135,12 +196,10 @@ router.get("/:id/pdf", async (req, res) => {
   res.setHeader("Content-Disposition", `attachment; filename=reporte_${id}.pdf`);
   doc.pipe(res);
 
-  // Generate PDF content
   generatePDFContent(doc, report);
   doc.end();
 });
 
-/** Helper: Generate PDF Buffer **/
 async function generatePDFBuffer(report, vehiculo, owner) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument();
@@ -163,14 +222,14 @@ async function generatePDFBuffer(report, vehiculo, owner) {
     doc.text(`Fecha: ${new Date(report.fecha).toLocaleDateString()}`);
 
     doc.moveDown();
-    doc.fontSize(14).text(" Información del propietario", { underline: true });
+    doc.fontSize(14).text("Información del propietario", { underline: true });
     doc.fontSize(12);
     doc.text(`Nombre: ${owner.tmbre}`);
     doc.text(`Email: ${owner.email}`);
     doc.text(`CURP: ${owner.curp}`);
 
     doc.moveDown();
-    doc.fontSize(14).text("📟 Lecturas de Sensores", { underline: true });
+    doc.fontSize(14).text("Lecturas de Sensores", { underline: true });
     doc.fontSize(12);
     doc.text(`Kilometraje: ${report.kilometraje}`);
     doc.text(`Nivel de Aceite: ${report.nivelaceite}`);
@@ -201,7 +260,7 @@ function generatePDFContent(doc, report) {
 
   if (report.vehiculo_info.usuarios) {
     doc.moveDown();
-    doc.fontSize(14).text(" Información del propietario", { underline: true });
+    doc.fontSize(14).text("Información del propietario", { underline: true });
     doc.fontSize(12);
     doc.text(`Nombre: ${report.vehiculo_info.usuarios.tmbre}`);
     doc.text(`Email: ${report.vehiculo_info.usuarios.email}`);
